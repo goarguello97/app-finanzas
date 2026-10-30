@@ -1,5 +1,6 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { beforeEach, describe, expect, it } from "vitest";
+import { CATEGORIAS_INICIALES } from "@/lib/auth/inicializar";
 import { comoUsuario, crearDb, USUARIO_A, USUARIO_B } from "./helpers/db";
 
 type Fila = Record<string, unknown>;
@@ -59,6 +60,38 @@ describe("migraciones", () => {
       await expect(
         db.query("insert into public.cotizaciones (fuente, compra, venta) values ('otra', 1, 1)"),
       ).rejects.toThrow(/row-level security/);
+    });
+  });
+
+  it("el upsert de configuración usa el user_id del usuario y actualiza su fila", async () => {
+    await comoUsuario(db, USUARIO_A, async () => {
+      const upsert = `insert into public.configuracion (moneda_base) values ($1)
+                      on conflict (user_id) do update set moneda_base = excluded.moneda_base`;
+      await db.query(upsert, ["ARS"]);
+      await db.query(upsert, ["USD"]);
+
+      const configuraciones = await filas(db, "select user_id, moneda_base from public.configuracion");
+      expect(configuraciones).toEqual([{ user_id: USUARIO_A, moneda_base: "USD" }]);
+    });
+  });
+
+  it("cargar las categorías iniciales dos veces no duplica ni pisa cambios", async () => {
+    await comoUsuario(db, USUARIO_A, async () => {
+      const insertar = async () => {
+        for (const { nombre, tipo, excluye_totales = false } of CATEGORIAS_INICIALES) {
+          await db.query(
+            `insert into public.categorias (nombre, tipo, excluye_totales) values ($1, $2, $3)
+             on conflict (user_id, nombre, tipo) do nothing`,
+            [nombre, tipo, excluye_totales],
+          );
+        }
+      };
+      await insertar();
+      await db.query("update public.categorias set excluye_totales = true where nombre = 'Salud'");
+      await insertar();
+
+      expect(await filas(db, "select id from public.categorias")).toHaveLength(CATEGORIAS_INICIALES.length);
+      expect((await unaFila(db, "select excluye_totales from public.categorias where nombre = 'Salud'")).excluye_totales).toBe(true);
     });
   });
 
