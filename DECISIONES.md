@@ -73,3 +73,17 @@ Decisiones tomadas durante la construcción, con su motivo.
 - **Compras en cuotas:** cuentan completas en el mes de la compra, igual que `resumen_mensual`. La proyección mes a mes va en Cuotas (Fase 5).
 - **Saldo del mes:** ingresos menos gastos en moneda base, con las categorías excluidas fuera.
 - **Extra del mes:** se calcula con los ingresos en pesos contra el ingreso mínimo. Debajo del mínimo muestra cuánto falta.
+
+## Deudas
+
+- **`0003_eliminar_pago_deuda.sql`:** borra un pago junto con su gasto y recalcula el estado de la deuda. Sin esto, borrar un pago dejaba el gasto descontando del saldo de la cuenta, y hacerlo en dos pasos podía dejar uno sin el otro.
+- **Gastos generados por pagos:** no se editan ni se borran desde Movimientos, sino desde la deuda, para que no se desincronicen.
+- **Pago mayor al saldo:** se rechaza si el capital supera lo pendiente. Los intereses se indican aparte y no bajan el saldo.
+- **Pago desde tarjeta:** no se ofrece, porque las tarjetas no tienen saldo propio. Pagar desde otra moneda tampoco, porque el monto no coincidiría de los dos lados.
+- **Simulador, orden del mes:** primero se aplica el interés, después los mínimos y al final el sobrante. El objetivo se decide con el saldo al inicio del mes.
+- **Simulador, redondeo:** el interés de cada deuda se redondea a centavos, medio hacia arriba, todos los meses.
+- **Simulador, empates:** en bola de nieve gana la de mayor TNA, en avalancha la de menor saldo, y si siguen iguales, el orden de carga.
+- **Simulador, sin salida:** devuelve error si el saldo total no baja en un mes, o si pasan 1200 meses.
+- **Comparación:** todo en pesos. Las deudas en dólares se convierten con la venta y un mínimo redondeado hacia arriba, y la pantalla lo avisa. Sin cotización, esas deudas quedan afuera con un aviso. El extra sugerido es el del mes actual y se puede cambiar. El primer pago es el mes siguiente.
+- **Comparación, lenguaje:** informa la diferencia de intereses y no recomienda una estrategia: la elección es del usuario.
+- **Comparación, largo:** el cronograma muestra hasta 120 meses, para no generar una página enorme.
