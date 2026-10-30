@@ -63,3 +63,13 @@ Decisiones tomadas durante la construcción, con su motivo.
 - **Cuotas:** solo en gastos con tarjeta, hasta 60.
 - **Saldo inicial negativo:** permitido, para cuentas en descubierto.
 - **Listado:** los filtros viven en la URL, así el botón Atrás y volver desde la edición los conservan.
+
+## Resumen
+
+- **Sin cotización:** los totales muestran lo que está en la moneda base y dejan aparte lo que no se pudo convertir. Nunca se usa la cotización de otro exchange.
+- **Alias del exchange:** `dolarapp` y `arq` se toman como el mismo, por el cambio de nombre.
+- **Cuentas archivadas:** no suman en el total ni aparecen en Inicio, porque salieron de uso.
+- **Gastos por categoría:** barras simples de una sola serie, sin librería de gráficos. Cada fila trae monto y porcentaje en texto y lleva a sus movimientos, así que no hace falta tooltip ni tabla aparte. La barra se mide contra la categoría mayor.
+- **Compras en cuotas:** cuentan completas en el mes de la compra, igual que `resumen_mensual`. La proyección mes a mes va en Cuotas (Fase 5).
+- **Saldo del mes:** ingresos menos gastos en moneda base, con las categorías excluidas fuera.
+- **Extra del mes:** se calcula con los ingresos en pesos contra el ingreso mínimo. Debajo del mínimo muestra cuánto falta.
