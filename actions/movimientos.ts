@@ -80,7 +80,18 @@ export async function crearMovimiento(entrada: EntradaMovimiento): Promise<Resul
   });
 }
 
+const MENSAJE_PAGO = "Este gasto es un pago de deuda. Cambialo desde la deuda.";
+
+/** Un gasto generado por un pago se maneja desde la deuda, para que no se desincronicen. */
+async function esPagoDeDeuda(supabase: Cliente, id: string): Promise<boolean> {
+  const { count, error } = await supabase.from("pagos_deuda").select("id", { count: "exact", head: true }).eq("movimiento_id", id);
+  if (error) throw new Error(error.message);
+  return (count ?? 0) > 0;
+}
+
 export async function actualizarMovimiento(id: string, entrada: EntradaMovimiento): Promise<ResultadoMovimiento> {
+  await requireUser();
+  if (await esPagoDeDeuda(await crearClienteServer(), id)) return { ok: false, mensaje: MENSAJE_PAGO };
   return guardar(entrada, async (supabase, fila) => {
     const { data, error } = await supabase.from("movimientos").update(fila).eq("id", id).select("id").single();
     return { id: data?.id, error: error?.message ?? null };
@@ -101,6 +112,8 @@ export async function deshacerMovimiento(id: string): Promise<{ ok: boolean }> {
 }
 
 export async function eliminarMovimiento(id: string, volverA: string): Promise<{ mensaje?: string }> {
+  await requireUser();
+  if (await esPagoDeDeuda(await crearClienteServer(), id)) return { mensaje: MENSAJE_PAGO };
   const { ok } = await deshacerMovimiento(id);
   if (!ok) return { mensaje: "No pudimos eliminar el movimiento. Probá de nuevo." };
   redirect(volverA.startsWith("/movimientos") ? volverA : "/movimientos");

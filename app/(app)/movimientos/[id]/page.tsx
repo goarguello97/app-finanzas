@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { eliminarMovimiento } from "@/actions/movimientos";
+import { Button } from "@/components/ui/button";
 import { BotonConfirmar } from "@/components/boton-confirmar";
 import { Encabezado } from "@/components/encabezado";
 import { EnlaceVolver } from "@/components/enlace-volver";
@@ -39,6 +41,20 @@ export default async function EditarMovimientoPage({
   if (!movimiento.data) notFound();
 
   const m = movimiento.data;
+
+  const pago = await supabase.from("pagos_deuda").select("deuda_id").eq("movimiento_id", id).maybeSingle();
+  if (pago.error) throw new Error(`Leer pago: ${pago.error.message}`);
+  if (pago.data) {
+    return (
+      <>
+        <EnlaceVolver href={volverA} etiqueta="Movimientos" />
+        <Encabezado titulo="Pago de deuda" descripcion="Este gasto se generó al registrar un pago. Para cambiarlo o eliminarlo, hacelo desde la deuda." />
+        <Button asChild className="self-start">
+          <Link href={`/deudas/${pago.data.deuda_id}`}>Ir a la deuda</Link>
+        </Button>
+      </>
+    );
+  }
 
   return (
     <>
