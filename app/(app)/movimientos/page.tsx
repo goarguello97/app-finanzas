@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react/ssr";
 import { MontoMovimiento } from "@/components/dinero/monto";
 import { Encabezado } from "@/components/encabezado";
 import { EstadoVacio } from "@/components/estado-vacio";
 import { FiltrosMovimientos } from "@/components/movimientos/filtros";
+import { SelectorMes } from "@/components/selector-mes";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/sesion";
 import type { Moneda } from "@/lib/dinero";
@@ -55,20 +55,12 @@ export default async function MovimientosPage({
     <>
       <Encabezado titulo="Movimientos" />
 
-      <div className="flex items-center justify-between gap-2 rounded-control border bg-card lg:max-w-xl">
-        <Button asChild variant="ghost" size="icon" aria-label="Mes anterior">
-          <Link href={urlListado({ ...filtros, mes: sumarMeses(filtros.mes, -1) })}>
-            <CaretLeftIcon aria-hidden className="size-5" />
-          </Link>
-        </Button>
-        <p className="font-medium first-letter:uppercase" aria-live="polite">
-          {nombreMes(filtros.mes)}
-        </p>
-        <Button asChild variant="ghost" size="icon" aria-label="Mes siguiente">
-          <Link href={urlListado({ ...filtros, mes: sumarMeses(filtros.mes, 1) })}>
-            <CaretRightIcon aria-hidden className="size-5" />
-          </Link>
-        </Button>
+      <div className="lg:max-w-xl">
+        <SelectorMes
+          mes={filtros.mes}
+          anterior={urlListado({ ...filtros, mes: sumarMeses(filtros.mes, -1) })}
+          siguiente={urlListado({ ...filtros, mes: sumarMeses(filtros.mes, 1) })}
+        />
       </div>
 
       <FiltrosMovimientos filtros={filtros} cuentas={cuentas.data} categorias={categorias.data} />
