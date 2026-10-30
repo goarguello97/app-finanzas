@@ -50,3 +50,16 @@ Decisiones tomadas durante la construcción, con su motivo.
 ## PWA
 
 - **Service worker:** solo habilita la instalación; no intercepta pedidos ni cachea, porque offline no es requisito.
+
+## Cuentas y movimientos
+
+- **Carga rápida:** elegir la categoría no guarda sola; hace falta tocar "Guardar". Es un toque más, pero evita movimientos por un toque equivocado, y sigue entrando holgado en 10 segundos. Al guardar aparece "Deshacer" durante 6 segundos.
+- **Categorías en la carga:** ordenadas por uso en los últimos 90 días. Sin historial van por nombre, con las que no cuentan en los totales al final.
+- **Cuenta por defecto:** la del último movimiento, si sigue activa.
+- **Categoría obligatoria en la carga rápida:** salvo que no exista ninguna de ese tipo. En la edición se puede dejar "Sin categoría", porque es lo que queda al borrar una categoría.
+- **Panel de carga:** `<dialog>` nativo, sin librería, porque ya resuelve foco, Escape y capa superior. También acepta el teclado físico en escritorio.
+- **Cuentas con movimientos:** no se pueden eliminar ni cambiar de tipo o moneda, porque se reinterpretarían montos ya cargados. Se archivan, y dejan de aparecer al cargar.
+- **Categorías:** el tipo no se puede cambiar después de crearlas, porque dejaría movimientos con una categoría del tipo contrario. Al borrarlas, sus movimientos quedan sin categoría.
+- **Cuotas:** solo en gastos con tarjeta, hasta 60.
+- **Saldo inicial negativo:** permitido, para cuentas en descubierto.
+- **Listado:** los filtros viven en la URL, así el botón Atrás y volver desde la edición los conservan.
