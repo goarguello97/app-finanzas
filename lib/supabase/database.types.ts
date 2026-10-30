@@ -543,6 +543,7 @@ export type Database = {
       }
     }
     Functions: {
+      eliminar_pago_deuda: { Args: { p_pago_id: string }; Returns: undefined }
       registrar_pago_deuda: {
         Args: {
           p_categoria_id?: string
