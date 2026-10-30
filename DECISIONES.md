@@ -17,7 +17,7 @@ Decisiones tomadas durante la construcción, con su motivo.
 - **Estado de la deuda:** `registrar_pago_deuda` la marca `saldada` cuando el capital pagado cubre `monto_total`.
 - **Fuente del esquema:** `supabase/migrations`. El `schema.sql` de la raíz queda fuera de git.
 - **Tests de SQL:** corren sobre PGlite (Postgres embebido) con un stub de `auth`, sin depender de Docker ni de un proyecto real.
-- **Tipos de la base:** `lib/supabase/database.types.ts` está escrito a mano hasta que exista el proyecto; después se regenera con `npm run db:types`.
+- **Tipos de la base:** `lib/supabase/database.types.ts` se genera con `npm run db:types` desde el proyecto vinculado; no se edita a mano.
 
 ## Fechas y dinero
 
