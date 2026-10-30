@@ -1,0 +1,25 @@
+# dependencias
+node_modules/
+
+# next
+.next/
+out/
+next-env.d.ts
+
+# entorno
+.env
+.env.local
+.env.*.local
+
+# varios
+*.tsbuildinfo
+.DS_Store
+coverage/
+.vercel/
+
+# supabase cli
+supabase/.branches/
+supabase/.temp/
+
+# la fuente del esquema es supabase/migrations
+/schema.sql
