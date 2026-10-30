@@ -65,6 +65,12 @@ describe("CATEGORIAS_INICIALES", () => {
     expect(new Set(claves).size).toBe(claves.length);
   });
 
+  it("todas las filas traen las mismas claves, porque el insert múltiple completa las faltantes con null", () => {
+    for (const categoria of CATEGORIAS_INICIALES) {
+      expect(Object.keys(categoria).sort()).toEqual(["excluye_totales", "nombre", "tipo"]);
+    }
+  });
+
   it("marca Cambio de moneda como excluida, en gasto y en ingreso", () => {
     const excluidas = CATEGORIAS_INICIALES.filter((c) => c.excluye_totales);
     expect(excluidas.map((c) => [c.nombre, c.tipo])).toEqual([

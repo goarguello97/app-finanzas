@@ -78,7 +78,7 @@ describe("migraciones", () => {
   it("cargar las categorías iniciales dos veces no duplica ni pisa cambios", async () => {
     await comoUsuario(db, USUARIO_A, async () => {
       const insertar = async () => {
-        for (const { nombre, tipo, excluye_totales = false } of CATEGORIAS_INICIALES) {
+        for (const { nombre, tipo, excluye_totales } of CATEGORIAS_INICIALES) {
           await db.query(
             `insert into public.categorias (nombre, tipo, excluye_totales) values ($1, $2, $3)
              on conflict (user_id, nombre, tipo) do nothing`,

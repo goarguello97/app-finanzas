@@ -1,26 +1,31 @@
 export interface CategoriaInicial {
   nombre: string;
   tipo: "ingreso" | "gasto";
-  excluye_totales?: boolean;
+  excluye_totales: boolean;
 }
 
+// En un insert múltiple, PostgREST completa con null las claves que falten en
+// alguna fila: por eso todas las filas llevan excluye_totales.
+const gasto = (nombre: string, excluye_totales = false): CategoriaInicial => ({ nombre, tipo: "gasto", excluye_totales });
+const ingreso = (nombre: string, excluye_totales = false): CategoriaInicial => ({ nombre, tipo: "ingreso", excluye_totales });
+
 export const CATEGORIAS_INICIALES: readonly CategoriaInicial[] = [
-  { nombre: "Supermercado", tipo: "gasto" },
-  { nombre: "Comida afuera", tipo: "gasto" },
-  { nombre: "Transporte", tipo: "gasto" },
-  { nombre: "Alquiler y expensas", tipo: "gasto" },
-  { nombre: "Servicios", tipo: "gasto" },
-  { nombre: "Salud", tipo: "gasto" },
-  { nombre: "Salidas", tipo: "gasto" },
-  { nombre: "Ropa", tipo: "gasto" },
-  { nombre: "Educación", tipo: "gasto" },
-  { nombre: "Suscripciones", tipo: "gasto" },
-  { nombre: "Pago de deudas", tipo: "gasto" },
-  { nombre: "Otros gastos", tipo: "gasto" },
-  { nombre: "Cambio de moneda", tipo: "gasto", excluye_totales: true },
-  { nombre: "Retiro del negocio", tipo: "ingreso" },
-  { nombre: "Otros ingresos", tipo: "ingreso" },
-  { nombre: "Cambio de moneda", tipo: "ingreso", excluye_totales: true },
+  gasto("Supermercado"),
+  gasto("Comida afuera"),
+  gasto("Transporte"),
+  gasto("Alquiler y expensas"),
+  gasto("Servicios"),
+  gasto("Salud"),
+  gasto("Salidas"),
+  gasto("Ropa"),
+  gasto("Educación"),
+  gasto("Suscripciones"),
+  gasto("Pago de deudas"),
+  gasto("Otros gastos"),
+  gasto("Cambio de moneda", true),
+  ingreso("Retiro del negocio"),
+  ingreso("Otros ingresos"),
+  ingreso("Cambio de moneda", true),
 ];
 
 export interface AlmacenInicializacion {
