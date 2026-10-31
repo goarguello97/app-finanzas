@@ -87,3 +87,14 @@ Decisiones tomadas durante la construcción, con su motivo.
 - **Comparación:** todo en pesos. Las deudas en dólares se convierten con la venta y un mínimo redondeado hacia arriba, y la pantalla lo avisa. Sin cotización, esas deudas quedan afuera con un aviso. El extra sugerido es el del mes actual y se puede cambiar. El primer pago es el mes siguiente.
 - **Comparación, lenguaje:** informa la diferencia de intereses y no recomienda una estrategia: la elección es del usuario.
 - **Comparación, largo:** el cronograma muestra hasta 120 meses, para no generar una página enorme.
+
+## Metas y cotización
+
+- **Cron:** corre a las 12:00 UTC (9:00 de Buenos Aires), una vez por día. La fecha guardada es la de Buenos Aires. Si corre dos veces el mismo día, queda el último valor.
+- **Lectura de CriptoYa:** rechaza texto plano, JSON inesperado, exchange ausente y precios en cero. En esos casos loguea el error, responde 502 y no guarda nada.
+- **Autorización del cron:** `Authorization: Bearer CRON_SECRET`, comparado en tiempo constante. Sin secreto configurado, no entra nadie.
+- **Service role:** solo en `lib/supabase/admin.ts`, marcado `server-only`, y lo usa solo el cron.
+- **Metas completadas:** `completada` se recalcula al aportar, retirar, borrar un aporte o cambiar el objetivo. Puede volver atrás.
+- **Retiros:** no se puede retirar más de lo aportado.
+- **Aporte mensual necesario:** lo que falta dividido por los meses restantes, contando el actual y redondeando hacia arriba.
+- **Cuotas:** usa `cuotas_proyectadas` tal cual: la primera cuota cae el mes siguiente a la compra, sin mirar el día de cierre. Solo muestra del mes actual en adelante y suma por moneda, sin convertir.

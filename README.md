@@ -45,6 +45,14 @@ npm install
 npm run dev
 ```
 
+## Cotización
+
+Vercel Cron llama a `/api/cron/cotizacion` una vez por día (ver `vercel.json`). Para correrlo a mano, con la app levantada y `$CRON_SECRET` en tu entorno:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/cotizacion
+```
+
 ## Comandos
 
 | Comando | Qué hace |
