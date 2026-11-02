@@ -98,3 +98,10 @@ Decisiones tomadas durante la construcción, con su motivo.
 - **Retiros:** no se puede retirar más de lo aportado.
 - **Aporte mensual necesario:** lo que falta dividido por los meses restantes, contando el actual y redondeando hacia arriba.
 - **Cuotas:** usa `cuotas_proyectadas` tal cual: la primera cuota cae el mes siguiente a la compra, sin mirar el día de cierre. Solo muestra del mes actual en adelante y suma por moneda, sin convertir.
+
+## Pulido
+
+- **Auditoría:** se pasaron las 22 pantallas por axe-core (WCAG 2.2 AA y buenas prácticas), a 375 px y 1280 px, en claro y oscuro, más el panel de carga abierto y el login. Sin violaciones ni scroll horizontal.
+- **Navegación por teclado:** hay un enlace "Saltar al contenido" que aparece al tabular.
+- **Headers de seguridad:** `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS y `X-Frame-Options: SAMEORIGIN`. Es SAMEORIGIN y no DENY para poder auditar las pantallas en iframes propios; otro sitio igual no puede embeberla.
+- **Error global:** `app/global-error.tsx` cubre una falla del layout raíz.
