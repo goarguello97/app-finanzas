@@ -149,6 +149,46 @@ describe("migraciones", () => {
     });
   });
 
+  describe("eliminar_pago_deuda", () => {
+    const registrar = "select public.registrar_pago_deuda($1, $2, $3, $4, $5) as id";
+    const eliminar = "select public.eliminar_pago_deuda($1)";
+
+    it("borra el pago y su movimiento, y devuelve el saldo", async () => {
+      await comoUsuario(db, USUARIO_A, async () => {
+        const cuenta = await crearCuenta(db);
+        const deuda = await crearDeuda(db);
+        const pago = await unaFila(db, registrar, [deuda, "100.00", "2026-10-15", "0", cuenta]);
+        await db.query(eliminar, [pago.id]);
+
+        expect(await filas(db, "select id from public.pagos_deuda")).toHaveLength(0);
+        expect(await filas(db, "select id from public.movimientos")).toHaveLength(0);
+        expect((await unaFila(db, "select pendiente from public.deudas_saldo")).pendiente).toBe("1000.00");
+      });
+    });
+
+    it("una deuda saldada vuelve a activa", async () => {
+      await comoUsuario(db, USUARIO_A, async () => {
+        const deuda = await crearDeuda(db, "100.00");
+        const pago = await unaFila(db, registrar, [deuda, "100.00", "2026-10-15", "0", null]);
+        expect((await unaFila(db, "select estado from public.deudas")).estado).toBe("saldada");
+
+        await db.query(eliminar, [pago.id]);
+        expect((await unaFila(db, "select estado from public.deudas")).estado).toBe("activa");
+      });
+    });
+
+    it("no borra el pago de otro usuario", async () => {
+      const pago = await comoUsuario(db, USUARIO_A, async () => {
+        const deuda = await crearDeuda(db);
+        return unaFila(db, registrar, [deuda, "100.00", "2026-10-15", "0", null]);
+      });
+      await comoUsuario(db, USUARIO_B, async () => {
+        await expect(db.query(eliminar, [pago.id])).rejects.toThrow(/El pago no existe/);
+      });
+      expect(await filas(db, "select id from public.pagos_deuda")).toHaveLength(1);
+    });
+  });
+
   describe("registrar_pago_deuda", () => {
     const registrar = "select public.registrar_pago_deuda($1, $2, $3, $4, $5) as id";
 

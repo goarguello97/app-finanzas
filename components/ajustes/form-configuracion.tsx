@@ -1,8 +1,9 @@
 "use client";
 
 import { useActionState } from "react";
-import { CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react";
+import { CheckCircleIcon } from "@phosphor-icons/react";
 import { guardarConfiguracion, type EstadoConfiguracion } from "@/actions/configuracion";
+import { ErrorDeCampo } from "@/components/error-de-campo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,16 +17,6 @@ interface Valores {
 
 const ESTADO_INICIAL: EstadoConfiguracion = { estado: "inicial" };
 const MONEDAS = ["ARS", "USD"];
-
-function ErrorDeCampo({ id, mensaje }: { id: string; mensaje?: string }) {
-  if (!mensaje) return null;
-  return (
-    <p id={id} className="flex items-start gap-1.5 text-sm text-destructive">
-      <WarningCircleIcon aria-hidden className="mt-0.5 size-4 shrink-0" weight="bold" />
-      {mensaje}
-    </p>
-  );
-}
 
 export function FormConfiguracion({ inicial }: { inicial: Valores }) {
   const [estado, accion, pendiente] = useActionState(guardarConfiguracion, ESTADO_INICIAL);

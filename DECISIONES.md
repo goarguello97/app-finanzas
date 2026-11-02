@@ -50,3 +50,58 @@ Decisiones tomadas durante la construcción, con su motivo.
 ## PWA
 
 - **Service worker:** solo habilita la instalación; no intercepta pedidos ni cachea, porque offline no es requisito.
+
+## Cuentas y movimientos
+
+- **Carga rápida:** elegir la categoría no guarda sola; hace falta tocar "Guardar". Es un toque más, pero evita movimientos por un toque equivocado, y sigue entrando holgado en 10 segundos. Al guardar aparece "Deshacer" durante 6 segundos.
+- **Categorías en la carga:** ordenadas por uso en los últimos 90 días. Sin historial van por nombre, con las que no cuentan en los totales al final.
+- **Cuenta por defecto:** la del último movimiento, si sigue activa.
+- **Categoría obligatoria en la carga rápida:** salvo que no exista ninguna de ese tipo. En la edición se puede dejar "Sin categoría", porque es lo que queda al borrar una categoría.
+- **Panel de carga:** `<dialog>` nativo, sin librería, porque ya resuelve foco, Escape y capa superior. También acepta el teclado físico en escritorio.
+- **Cuentas con movimientos:** no se pueden eliminar ni cambiar de tipo o moneda, porque se reinterpretarían montos ya cargados. Se archivan, y dejan de aparecer al cargar.
+- **Categorías:** el tipo no se puede cambiar después de crearlas, porque dejaría movimientos con una categoría del tipo contrario. Al borrarlas, sus movimientos quedan sin categoría.
+- **Cuotas:** solo en gastos con tarjeta, hasta 60.
+- **Saldo inicial negativo:** permitido, para cuentas en descubierto.
+- **Listado:** los filtros viven en la URL, así el botón Atrás y volver desde la edición los conservan.
+
+## Resumen
+
+- **Sin cotización:** los totales muestran lo que está en la moneda base y dejan aparte lo que no se pudo convertir. Nunca se usa la cotización de otro exchange.
+- **Alias del exchange:** `dolarapp` y `arq` se toman como el mismo, por el cambio de nombre.
+- **Cuentas archivadas:** no suman en el total ni aparecen en Inicio, porque salieron de uso.
+- **Gastos por categoría:** barras simples de una sola serie, sin librería de gráficos. Cada fila trae monto y porcentaje en texto y lleva a sus movimientos, así que no hace falta tooltip ni tabla aparte. La barra se mide contra la categoría mayor.
+- **Compras en cuotas:** cuentan completas en el mes de la compra, igual que `resumen_mensual`. La proyección mes a mes va en Cuotas (Fase 5).
+- **Saldo del mes:** ingresos menos gastos en moneda base, con las categorías excluidas fuera.
+- **Extra del mes:** se calcula con los ingresos en pesos contra el ingreso mínimo. Debajo del mínimo muestra cuánto falta.
+
+## Deudas
+
+- **`0003_eliminar_pago_deuda.sql`:** borra un pago junto con su gasto y recalcula el estado de la deuda. Sin esto, borrar un pago dejaba el gasto descontando del saldo de la cuenta, y hacerlo en dos pasos podía dejar uno sin el otro.
+- **Gastos generados por pagos:** no se editan ni se borran desde Movimientos, sino desde la deuda, para que no se desincronicen.
+- **Pago mayor al saldo:** se rechaza si el capital supera lo pendiente. Los intereses se indican aparte y no bajan el saldo.
+- **Pago desde tarjeta:** no se ofrece, porque las tarjetas no tienen saldo propio. Pagar desde otra moneda tampoco, porque el monto no coincidiría de los dos lados.
+- **Simulador, orden del mes:** primero se aplica el interés, después los mínimos y al final el sobrante. El objetivo se decide con el saldo al inicio del mes.
+- **Simulador, redondeo:** el interés de cada deuda se redondea a centavos, medio hacia arriba, todos los meses.
+- **Simulador, empates:** en bola de nieve gana la de mayor TNA, en avalancha la de menor saldo, y si siguen iguales, el orden de carga.
+- **Simulador, sin salida:** devuelve error si el saldo total no baja en un mes, o si pasan 1200 meses.
+- **Comparación:** todo en pesos. Las deudas en dólares se convierten con la venta y un mínimo redondeado hacia arriba, y la pantalla lo avisa. Sin cotización, esas deudas quedan afuera con un aviso. El extra sugerido es el del mes actual y se puede cambiar. El primer pago es el mes siguiente.
+- **Comparación, lenguaje:** informa la diferencia de intereses y no recomienda una estrategia: la elección es del usuario.
+- **Comparación, largo:** el cronograma muestra hasta 120 meses, para no generar una página enorme.
+
+## Metas y cotización
+
+- **Cron:** corre a las 12:00 UTC (9:00 de Buenos Aires), una vez por día. La fecha guardada es la de Buenos Aires. Si corre dos veces el mismo día, queda el último valor.
+- **Lectura de CriptoYa:** rechaza texto plano, JSON inesperado, exchange ausente y precios en cero. En esos casos loguea el error, responde 502 y no guarda nada.
+- **Autorización del cron:** `Authorization: Bearer CRON_SECRET`, comparado en tiempo constante. Sin secreto configurado, no entra nadie.
+- **Service role:** solo en `lib/supabase/admin.ts`, marcado `server-only`, y lo usa solo el cron.
+- **Metas completadas:** `completada` se recalcula al aportar, retirar, borrar un aporte o cambiar el objetivo. Puede volver atrás.
+- **Retiros:** no se puede retirar más de lo aportado.
+- **Aporte mensual necesario:** lo que falta dividido por los meses restantes, contando el actual y redondeando hacia arriba.
+- **Cuotas:** usa `cuotas_proyectadas` tal cual: la primera cuota cae el mes siguiente a la compra, sin mirar el día de cierre. Solo muestra del mes actual en adelante y suma por moneda, sin convertir.
+
+## Pulido
+
+- **Auditoría:** se pasaron las 22 pantallas por axe-core (WCAG 2.2 AA y buenas prácticas), a 375 px y 1280 px, en claro y oscuro, más el panel de carga abierto y el login. Sin violaciones ni scroll horizontal.
+- **Navegación por teclado:** hay un enlace "Saltar al contenido" que aparece al tabular.
+- **Headers de seguridad:** `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS y `X-Frame-Options: SAMEORIGIN`. Es SAMEORIGIN y no DENY para poder auditar las pantallas en iframes propios; otro sitio igual no puede embeberla.
+- **Error global:** `app/global-error.tsx` cubre una falla del layout raíz.
